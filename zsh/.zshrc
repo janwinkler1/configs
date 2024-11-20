@@ -8,6 +8,7 @@ plugins=(
 	git
 	zsh-autosuggestions
 	zsh-syntax-highlighting
+    poetry
 )
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=209'
 source $ZSH/oh-my-zsh.sh
@@ -18,9 +19,8 @@ alias ll="ls -la"
 alias mountskynet="sudo mount -t cifs //skynet.wuestundpartner.com/Projekte /mnt/skynet -o credentials=/home/jwi/.smbcredentials"
 alias unmountskynet="sudo umount /mnt/skynet"
 alias backup="./backup.sh"
-alias black-docker="docker run --rm -v \$(pwd):/data cytopia/black:latest"
-alias prettier-check="docker run --rm -v \$(pwd):/app tmknom/prettier:latest@sha256:8809a179395bc38f305dab67aa16d9d94d84348309fba87442548485fd7c71ee prettier --check /app"
-alias prettier-write="docker run --rm -v \$(pwd):/app tmknom/prettier:latest@sha256:8809a179395bc38f305dab67aa16d9d94d84348309fba87442548485fd7c71ee prettier --write /app"
+alias black-docker="docker run --rm -u $(id -u):$(id -g) -v \$(pwd):/data cytopia/black:latest black"
+alias prettier-write="docker run --rm --user root --volume \$(pwd):/work tmknom/prettier prettier --loglevel warn --write ."
 alias gitka="gitk --all"
 
 # autoload -Uz promptinit
@@ -64,4 +64,9 @@ export EDITOR='nvim'
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 

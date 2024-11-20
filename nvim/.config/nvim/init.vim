@@ -1,4 +1,4 @@
-"" Set up data directory for vim-plug
+" Set up data directory for vim-plug
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 
 " Automatically download and install vim-plug if not present
@@ -59,10 +59,6 @@ Plug 'jpalardy/vim-slime'
 " treesitter
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
-" python debugger (nvim-dap)
-Plug 'mfussenegger/nvim-dap'
-Plug 'mfussenegger/nvim-dap-python'
-
 
 " SQL Autocompletion and Linting
 Plug 'kristijanhusak/vim-dadbod-completion'
@@ -84,7 +80,8 @@ let $PATH = '/home/jwi/anaconda3/bin:' . $PATH
 set hlsearch
 set ignorecase
 set incsearch
-set noswapfile 
+set noswapfile
+set shell=/bin/bash
 
 " fzf configurations
 set path+=**
@@ -106,6 +103,13 @@ let g:airline#extensions#branch#enabled = 1
 
 " color theme configuration
 colorscheme moonfly
+
+
+" Disable folding for Markdown files
+autocmd FileType markdown setlocal nofoldenable
+
+" Set indentation for TypeScript and TSX files
+autocmd FileType typescript,typescriptreact,javascript setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 
 " markdown-preview config
 " set to 1, nvim will open the preview window after entering the Markdown buffer
@@ -276,47 +280,11 @@ xmap <C-s> <Plug>SlimeRegionSend
 " }
 " EOF
 
-" lua << EOF
-" -- Set up DAP for Python
-" require('dap-python').setup('~/.virtualenvs/debugpy/bin/python')
-
-" -- Optional: Custom test runner configuration
-" require('dap-python').test_runner = 'pytest' -- Change 'pytest' to your test runner of choice
-
-" -- Key mappings for DAP
-" vim.api.nvim_set_keymap('n', '<leader>dn', ":lua require('dap-python').test_method()<CR>", {silent = true})
-" vim.api.nvim_set_keymap('n', '<leader>df', ":lua require('dap-python').test_class()<CR>", {silent = true})
-" vim.api.nvim_set_keymap('v', '<leader>ds', "<ESC>:lua require('dap-python').debug_selection()<CR>", {silent = true})
-
-" -- Additional DAP configurations if needed
-" -- This is where you can add custom DAP configurations
-" require('dap').configurations.python = {
-"   {
-"     type = 'python',
-"     request = 'launch',
-"     name = 'Python Docker',
-"     program = '${file}',
-"     pythonPath = function()
-"         return 'usr/local/bin/python'
-"     end, 
-"     pathMappings = {
-"         {
-"                 localRoot = "${working/}", 
-"                 remoteRoot = "/detec"
-
-"             }
-
-
-"         },
-"     -- Add other configuration settings as needed
-"   }
-" }
-" EOF
 
 
 lua << EOF
 require'nvim-treesitter.configs'.setup {
-    ensure_installed = {"lua", "python", "r", "yaml", "markdown", "sql", "javascript", "typescript", "starlark", "rust"}, -- Only install Python parser
+    ensure_installed = {"lua", "python", "r", "yaml", "markdown", "sql", "javascript", "typescript", "tsx" , "starlark", "rust", "json5", "json"}, -- Only install Python parser
   highlight = {
     enable = true,              -- Enable Tree-sitter based highlighting
     additional_vim_regex_highlighting = false,
@@ -327,4 +295,19 @@ require'nvim-treesitter.configs'.setup {
 }
 EOF
 
+" Set ripgrep as the default grep program for fzf.vim
+let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow --glob "!.git/*"'
+
+" Optional: Enable preview window in fzf
+let g:fzf_preview_window = ['right:50%', 'ctrl-/']
+
+
+" Inside init.vim (Vimscript)
+lua << EOF
+vim.api.nvim_set_keymap('n', '<leader>ff', ':Files<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>fg', ':GFiles<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>fb', ':Buffers<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>fr', ':Rg<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>ps', ':Rg<SPACE><CR>', { noremap = true, silent = true })
+EOF
 
